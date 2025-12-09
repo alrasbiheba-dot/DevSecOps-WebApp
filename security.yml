@@ -16,10 +16,14 @@ jobs:
           python-version: '3.10'
 
       - name: Install dependencies
-        run: pip install flask bandit safety
+        run: pip install -r requirements_new.txt
 
       - name: SAST - Bandit Scan
-        run: bandit -r .
+        run: |
+          pip install bandit
+          bandit -r .
 
       - name: SCA - Safety Scan
-        run: safety check --full-report
+        run: |
+          pip install safety
+          safety check -r requirements_new.txt --full-report
