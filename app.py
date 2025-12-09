@@ -13,9 +13,7 @@ def home():
 
         conn = sqlite3.connect("app.db")
         cur = conn.cursor()
-#vulnersbility (SQL injection)
-        query = f"SELECT * FROM users WHERE username='{user}' AND password='{pwd}'"
-        cur.execute(query)
+        cur.execute("SELECT * FROM users WHERE username=? AND password=?", (user, pwd))
 
 
         result = cur.fetchone()
