@@ -1,23 +1,23 @@
 from flask import Flask, request, render_template_string
 import sqlite3
+import os  # 👈 أضيفي هذا السطر
 
 app = Flask(__name__)
 
-# intentionally vulnerable login route (SQL injection)
+# ✅ FIXED: Secure login route
 @app.route("/", methods=["GET", "POST"])
 def home():
     msg = ""
     if request.method == "POST":
         user = request.form["user"]
         pwd = request.form["pwd"]
-# with SQL injection 
+        
         conn = sqlite3.connect("app.db")
         cur = conn.cursor()
-        query = f"SELECT * FROM users WHERE username='{user}' AND password='{pwd}'"
-        cur.execute(query)
-
-
-
+        
+        # ✅ FIXED: Parameterized query (prevents SQL injection)
+        cur.execute("SELECT * FROM users WHERE username=? AND password=?", (user, pwd))
+        
         result = cur.fetchone()
 
         if result:
@@ -36,9 +36,6 @@ def home():
     """, msg=msg)
 
 if __name__ == "__main__":
-    app.run(debug=True)
-
-
-
-
-
+    # ✅ FIXED: Read debug mode from environment variable
+    debug_mode = os.getenv('FLASK_DEBUG', 'False').lower() == 'true'
+    app.run(debug=debug_mode)
